@@ -10,11 +10,12 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import AuthNavigation from './navigation/AuthNavigation';
 import EmployeeNavigation from './navigation/EmployeeNavigation';
 import AdminNavigation from './navigation/AdminNavigation';
-import { AppStackParams } from '../types/rootNavigation';
+import {AppStackParams} from '../types/rootNavigation';
+import { Text } from 'react-native-paper';
+
 const HeartIcon = (
   props?: Partial<ImageProps>,
 ): React.ReactElement<ImageProps> => <Icon {...props} name="heart" />;
-
 
 const AppStack = createNativeStackNavigator<AppStackParams>();
 
@@ -26,37 +27,37 @@ export default (): React.ReactElement => {
    */
   const [appState, setAppState] = useState(0);
   const [initialRoute, setInitialRoute] = useState('authNavigation');
-  // useEffect(() => {
+  useEffect(() => {
   //   let k = setTimeout(async () => {
   //     const authState = await checkAuth();
   //     console.log('authState', authState);
-      
+
   //     setAppState(authState);
-  //     SplashScreen.hide();
+      SplashScreen .hide();
   //   }, 200);
   //   return () => {
   //     clearTimeout(k);
   //   };
-  // }, []);
+  }, []);
 
   return (
     <>
       <IconRegistry icons={EvaIconsPack} />
       <StatusBar backgroundColor={'#fff'} barStyle={'dark-content'} />
-      <ApplicationProvider {...eva} theme={eva.light}>
-        <NavigationContainer>
-
-          <AppStack.Navigator screenOptions={{headerShown:false}}>
-    
-          {/* {appState === 0 && <AuthNavigation setAppState={setAppState} />}
-          {appState === 1  && <EmployeeNavigation />}
-          {appState === 2 && <AdminNavigation />} */}
-          <AppStack.Screen name="AUTH_NAVIGATION" component={AuthNavigation} />
-          <AppStack.Screen name="EMPLOYEE_NAVIGATION" component={EmployeeNavigation} />
-          <AppStack.Screen name="ADMIN_NAVIGATION" component={AdminNavigation}/>
+          <AppStack.Navigator screenOptions={{headerShown: false}}>
+            <AppStack.Screen
+              name="AUTH_NAVIGATION"
+              component={AuthNavigation}
+            />
+            <AppStack.Screen
+              name="EMPLOYEE_NAVIGATION"
+              component={EmployeeNavigation}
+            />
+            {/* <AppStack.Screen
+              name="ADMIN_NAVIGATION"
+              component={AdminNavigation}
+            /> */}
           </AppStack.Navigator>
-        </NavigationContainer>
-      </ApplicationProvider>
     </>
   );
 };

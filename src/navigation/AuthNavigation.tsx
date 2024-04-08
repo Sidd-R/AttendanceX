@@ -4,15 +4,24 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../screens/auth/Login';
 import ProfileDetails from '../screens/auth/ProfileDetails';
 
-const authStack = createNativeStackNavigator();
+export type AuthStackParams = {
+  LOGIN: undefined;
+  PROFILE_DETAILS: {
+    empid: string;
+  }
+  EMPLOYEE_NAVIGATION: undefined;
+  ADMIN_NAVIGATION: undefined;
+}
+
+const authStack = createNativeStackNavigator<AuthStackParams>();
 
 const AuthNavigation = (props:any) => {
   return (
     <authStack.Navigator screenOptions={{headerShown:false}}>
-      <authStack.Screen name="login" component={Login} 
+      <authStack.Screen name="LOGIN" component={Login} 
       // initialParams={{...props}} 
       />
-      <authStack.Screen name="profileDetails" component={ProfileDetails} 
+      <authStack.Screen name="PROFILE_DETAILS" component={ProfileDetails} 
       // initialParams={{...props}} 
       />
     </authStack.Navigator>

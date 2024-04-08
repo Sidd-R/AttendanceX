@@ -1,15 +1,16 @@
 import React from 'react';
 import HomeHeader from '../../components/admin/HomeHeader';
-import { Divider, Icon, Layout, Text } from '@ui-kitten/components';
+import { ButtonGroup, Divider, Icon, Layout, Text, Button } from '@ui-kitten/components';
 import {
   StyleSheet,
   Dimensions,
   Pressable,
   ImageBackground,
   ImageProps,
-  Button
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AdminStackParams } from '../../../types/admin/navigation';
 
 interface Section {
   title: string;
@@ -36,7 +37,9 @@ const sections: Section[] = [
 }
 ]
 
-const AdminHome = () => {
+type Props = NativeStackScreenProps<AdminStackParams, 'ADMIN_HOME'>;
+
+const AdminHome = ({navigation}:Props) => {
   const employeeRef = React.useRef<Icon<Partial<ImageProps>>>(null);
   const locationRef = React.useRef<Icon<Partial<ImageProps>>>(null);
   const attendanceRef = React.useRef<Icon<Partial<ImageProps>>>(null);
@@ -47,104 +50,91 @@ const AdminHome = () => {
   //   infiniteAnimationIconRef.current?.startAnimation();
   // }, []);
   return (
-    <Layout style={styles.container} level="2">
-      <Text category="h2" style={{ marginVertical: 12 }}>
-        Hey Admin,
+    <Layout style={styles.container} level="1">
+      <Text category="h4" style={{ marginVertical: 12, fontStyle:'italic' }}
+      // appearance='primary'
+      status='primary'
+      >
+        STATS
       </Text>
-      <Layout style={styles.main} level="2">
-        {/* {sections.map((section) => (<Pressable
-          onPress={() => {
-            setTimeout(() => {
-              router.push(section.path);
-            }, 1000);
-            zoomIconRef.current?.startAnimation();
-          }}
-          style={styles.boxContainer}
-        >
-          <ImageBackground
-            source={require('../assets/images/blueflame.jpeg')}
-            style={styles.box}
-          >
-            <Text category="h4" style={{ color: 'white' }}>
-              Attendance
-            </Text>
-            <Icon
-              style={styles.iconContainer}
-              name="file-text-outline"
-              animation={'zoom'}
-              ref={zoomIconRef}
-            />
-          </ImageBackground>
-        </Pressable>))} */}
-        <Pressable
-          onPress={() => {
-            setTimeout(() => {
-            // router.push('/(employee)');
-            }, 1000);
-            employeeRef.current?.startAnimation();
-          }}
-          style={styles.boxContainer}
-        >
-          {/* <ImageBackground
-            source={require('../assets/images/blueflame.jpeg')}
-            style={styles.box}
-          >
-            <Text category="h4" style={{ color: 'white' }}>
-              Employee
-            </Text>
-              <Icon style={styles.iconContainer} name="people-outline" animation={'zoom'} ref={employeeRef} />
-          </ImageBackground> */}
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setTimeout(() => {
-              // router.push('/location');
-            }, 1000);
-            locationRef.current?.startAnimation();
-          }}
-          style={styles.boxContainer}
-        >
-          {/* <ImageBackground
-            source={require('../assets/images/blueflame.jpeg')}
-            style={styles.box}
-          >
-            <Text category="h4" style={{ color: 'white' }}>
-              Location
-            </Text>
-              <Icon style={styles.iconContainer}  name="map-outline" animation={'zoom'} ref={locationRef} />
-          </ImageBackground> */}
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setTimeout(() => {
-              // router.push('/attendance');
-            }, 1000);
-            attendanceRef.current?.startAnimation();
-          }}
-          style={styles.boxContainer}
-        >
-          {/* <ImageBackground
-            source={require('../assets/images/blueflame.jpeg')}
-            style={styles.box}
-          >
-            <Text category="h4" style={{ color: 'white' }}>
-              Attendance
-            </Text>
-            <Icon
-              style={styles.iconContainer}
-              name="file-text-outline"
-              animation={'zoom'}
-              ref={attendanceRef}
-            />
-          </ImageBackground> */}
-        </Pressable>
-        <Button onPress={() => {
-          
-          AsyncStorage.clear();
+      <Layout style={{
+        elevation: 10,
+        padding: 20,
+        borderRadius: 20,
+        marginBottom: 20,
+        // marginTop: 10,
+      }}
+      
+      level="2"
+      >
+        <Text category="h6">Today</Text>
+        <Text category="s2">Punched In:</Text>
+        <Text category="s2">Punched Out:</Text>
+        <Text category="s1">Total Hours:</Text>
+        <Divider />
+        <Text category="h6">This Month</Text>
+        <Text category="s2">Punched In:</Text>
+        <Text category="s2">Punched Out:</Text>
 
-        }} title='Logout' />
-          
       </Layout>
+      <Text category="h4" style={{ marginVertical: 12, fontStyle:'italic' }}
+      status='primary'
+      >
+        MANAGE
+      </Text>
+      <Layout style={{
+        elevation: 10,
+        padding: 20,
+        borderRadius: 20,
+        marginBottom: 20,
+        // marginTop: 10,
+      }}>
+          <Button
+            onPress={() => navigation.navigate('EMPLOYEE_LIST')}
+            accessoryRight={(props) => (
+              <Icon
+                {...props}
+                // ref={employeeRef}
+                name="people-outline"
+                // style={styles.iconContainer}
+              />
+            )}
+            appearance='ghost'
+            size='giant'
+          >
+            <Text>Employee</Text>
+          </Button>
+
+              <Divider />
+
+          <Button
+            // ref={locationRef}
+            onPress={() => navigation.navigate('ADMIN_ATTENDANCE')}
+            accessoryRight={(props) => (
+              <Icon
+                {...props}
+                // ref={locationRef}
+                name="file"
+                // style={styles.iconContainer}
+              />
+            )}
+            appearance='ghost'
+            size='giant'
+          >
+            <Text>Attendance</Text>
+          </Button>
+       
+      </Layout>
+      <Button
+      onPress={async () => {
+        await AsyncStorage.clear();
+        navigation.replace('AUTH_NAVIGATION');
+      }}
+      >
+        <Text>
+          logout
+        </Text>
+      </Button>
     </Layout>
   );
 };
@@ -154,7 +144,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 25,
     paddingVertical: 10,
-    gap: 10,
+    // gap: 10,
   },
   main: {
     flex: 1,

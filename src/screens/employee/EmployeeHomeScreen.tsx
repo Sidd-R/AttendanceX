@@ -1,15 +1,15 @@
-import {
-  Button,
-  Card,
-  Divider,
-  Icon,
-  Layout,
-  List,
-  ListItem,
-  Modal,
-  Spinner,
-  Text,
-} from '@ui-kitten/components';
+// import {
+//   Button,
+//   Card,
+//   Divider,
+//   Icon,
+//   Surface,
+//   List,
+//   ListItem,
+//   Modal,
+//   Spinner,
+//   Text,
+// } from '@ui-kitten/components';
 import {StyleSheet, Alert, Dimensions, View, Linking} from 'react-native';
 import React from 'react';
 import Loading from '../Loading';
@@ -19,15 +19,26 @@ import {checkAttendanceState} from '../../functions/employee/checkAttendanceStat
 import {punchIn, punchOut} from '../../functions/employee/markAttendance';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {EmployeeStackParams} from '../../../types/employee/navigation';
+import {timeFormat} from '../../utils/timeFormat';
+// import {Header} from '../../components/Header';
+import {
+  Appbar,
+  Avatar,
+  Button,
+  Card,
+  Divider,
+  Modal,
+  Portal,
+  Surface,
+  Text,
+  useTheme,
+} from 'react-native-paper';
 
+// const MapIcon = (props: any) => <Icon name="map" {...props} />;
 
-const MapIcon = (props:any) => (
-  <Icon name='map' {...props} />
-);
-
-export const LoginButton = () => (
-  <Button accessoryLeft={MapIcon}>Login with Facebook</Button>
-)
+// export const LoginButton = () => (
+//   <Button accessoryLeft={MapIcon}>Login with Facebook</Button>
+// );
 
 interface Location {
   name: string;
@@ -50,24 +61,6 @@ export default function EmployeeHomeScreen({navigation}: Props) {
   const [visible, setVisible] = React.useState(false);
   const [attendanceState, setAttendanceState] =
     React.useState<AttendanceState>();
-
-  const renderItem = ({
-    item,
-    index,
-  }: {
-    item: Location;
-    index: number;
-  }): React.ReactElement => (
-    <>
-      <ListItem
-        title={`${index + 1}. ${item.name}`}
-        description={`lat:${item.latitude}  lon:${item.longitude}`}
-        style={{backgroundColor: 'transparent', paddingLeft: 20}}
-      />
-      <Divider />
-    </>
-  );
-
   const [locations, setLocations] = React.useState<Location[] | null>([]);
 
   const loadAttendanceState = async () => {
@@ -80,208 +73,290 @@ export default function EmployeeHomeScreen({navigation}: Props) {
     loadAttendanceState();
   }, []);
 
-  function tConvert (timeStr: string) {
-    let time: any = timeStr.toString ().match (/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [timeStr];
-  
-    if (time.length > 1) { // If time format correct
-      console.log(time,1);
-      
-      time = time.slice (1);  // Remove full string match value
-      console.log(time,2);
-      time.pop(2)
-      time.push(' ')
-      time[5] = +time[0] < 12 ? 'AM' : 'PM'; // Set AM/PM
-      time[0] = +time[0] % 12 || 12; // Adjust hours
-      
-    }
-    return time.join (''); // return adjusted time or original string
-  }
-  
+  const theme = useTheme();
 
   return (
     <>
-      <Modal
-        visible={visible}
-        backdropStyle={styles.backdrop}
-        onBackdropPress={() => setVisible(false)}>
-        <Card disabled={true}>
-          <Text category="h6" style={{marginVertical: 10}}>
-            Alert
-          </Text>
-          <Text category="p1">
-            Are you sure you want to{' '}
-            {attendanceState?.status === 0 ? 'punch in' : 'punch out'}?
-          </Text>
-          <Layout style={styles.modalLayout}>
-            <Button
-              appearance="ghost"
-              size="large"
-              onPress={async () => {
-                if (attendanceState?.status === 0)
-                  await punchIn(loadAttendanceState);
-                else await punchOut(loadAttendanceState);
-                setVisible(false);
-              }}>
-              Yes
-            </Button>
-            <Button
-              appearance="ghost"
-              size="large"
-              status="danger"
-              onPress={() => setVisible(false)}>
-              No
-            </Button>
-          </Layout>
-        </Card>
-      </Modal>
-      <Layout
-        style={{
-          flex: 1,
-          alignItems: 'center',
-          paddingVertical: 20,
-          paddingHorizontal: 30,
-          gap: 30,
-        }}
-        level="1">
-        <Text category="h3">HOME</Text>
-        {attendanceState?.status === 0 ? (
-          <Button
-            appearance="outline"
-            size="giant"
-            status="danger"
-            style={styles.punchInButton}
-            onPress={async () => setVisible(true)}
-            disabled={submitted}>
-            Punch In
-          </Button>
-        ) : (
-          <Button
-            appearance="outline"
-            size="giant"
-            status="danger"
-            style={styles.punchInButton}
-            disabled={attendanceState?.status === 2}
-            onPress={async () => setVisible(true)}>
-            Punch Out
-          </Button>
-        )}
-        {/* <LoginButton /> */}
-
-        {attendanceState?.data?.intime !== undefined && (
-          <Layout
-            level="2"
+      <Portal>
+        <Modal
+          visible={visible}
+          // onBackdropPress={() => setVisible(false)}
+          contentContainerStyle={{
+            backgroundColor: 'white',
+            // padding: 20,
+            margin: 20,
+            borderRadius: 10,
+          }}
+          dismissable>
+          <Card
+            disabled={true}
             style={{
-              width: '100%',
-              borderRadius: 10,
-              borderWidth: 2,
-              borderColor: '#ff2f00',
-              paddingHorizontal: 20,
-              paddingBottom: 10,
-              paddingTop: 15,
-              // backgroundColor: '#ff2f00'
+              paddingVertical: 20,
+              paddingHorizontal: 30,
             }}>
-              <View style={{flexDirection:'row',alignItems:'center',gap:10}}>
-            <Text category="h6">TODAY</Text> 
-            
-            <Text category="s2">{new Date(attendanceState.data.date).toDateString()}</Text>
-            </View>
-            <Divider />
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                width: '100%',
-                alignItems: 'center',
-              }}>
-              <Text category="s2">Punch In:</Text>
+            <Text variant="titleLarge" style={{marginVertical:3, marginLeft:6}}>
+              Alert
+            </Text>
+            <Text>
+              Are you sure you want to{' '}
+              {attendanceState?.status === 0 ? 'punch in' : 'punch out'}?
+            </Text>
+            <View style={styles.modalSurface}>
               <Button
-              appearance="ghost"
-              size="small"
-              status='primary'
-              accessoryRight={MapIcon}
-              onPress={async () => {
-                await Linking.openURL(`geo:${attendanceState.data?.inlocationlat},${attendanceState.data?.inlocationlon}`)
-              }}
-              >
-              <Text category="s1" status="primary">
-                {tConvert(attendanceState.data.intime)
-                }
-              </Text>
-            </Button>
-
+                onPress={async () => {
+                  if (attendanceState?.status === 0)
+                    await punchIn(loadAttendanceState);
+                  else await punchOut(loadAttendanceState);
+                  setVisible(false);
+                }}>
+                Yes
+              </Button>
+              <Button
+                onPress={() => setVisible(false)}>
+                No
+              </Button>
             </View>
-            <Divider />
-            {attendanceState.data.outtime !== null && (
+          </Card>
+        </Modal>
+      </Portal>
+
+      <Appbar.Header style={{elevation: 9}}>
+        <Appbar.Content
+          title={new Date().toLocaleDateString()}
+          titleStyle={{
+            fontWeight: 'bold',
+          }}
+        />
+        <Avatar.Text
+          size={35}
+          label="SR"
+          style={{
+            marginRight: 10,
+          }}
+        />
+      </Appbar.Header>
+
+      <View
+        style={{
+          paddingHorizontal: 20,
+          paddingVertical: 20,
+          flex: 1,
+          gap: 20,
+          // backgroundColor: theme.colors.surface,'
+          // backgroundColor: '#f5f5f5'
+        }}>
+        <Surface
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-around',
+            padding: 20,
+            backgroundColor: theme.colors.primaryContainer,
+            borderRadius: 15,
+          }}>
+          <View>
+            <Text
+              variant="headlineSmall"
+              style={{
+                fontWeight: 'bold',
+                color: theme.colors.onPrimaryContainer,
+              }}>
+              Mark
+            </Text>
+            <Text
+              variant="headlineSmall"
+              style={{
+                fontWeight: 'bold',
+                color: theme.colors.onPrimaryContainer,
+              }}>
+              your
+            </Text>
+            <Text
+              variant="headlineSmall"
+              style={{
+                fontWeight: 'bold',
+                color: theme.colors.onPrimaryContainer,
+              }}>
+              attendance
+            </Text>
+          </View>
+          <View
+            style={{
+              gap: 10,
+            }}>
+            <Button
+              mode="elevated"
+              style={{
+                backgroundColor:
+                  attendanceState?.status != 1
+                    ? theme.colors.primary
+                    : theme.colors.onSurfaceDisabled,
+                borderRadius: 20,
+                paddingHorizontal: 10,
+                paddingVertical: 3,
+              }}
+              labelStyle={{fontWeight: 'bold', fontSize: 16}}
+              contentStyle={{}}
+              textColor={theme.colors.onPrimary}
+              onPress={() => {
+                setVisible(true);
+              }}
+              disabled={attendanceState?.status === 1}>
+              Punch In
+            </Button>
+            <Button
+              mode="elevated"
+              style={{
+                backgroundColor:
+                  attendanceState?.status != 0
+                    ? theme.colors.primary
+                    : theme.colors.onSurfaceDisabled,
+                borderRadius: 20,
+                paddingHorizontal: 10,
+                paddingVertical: 3,
+              }}
+              labelStyle={{fontWeight: 'bold', fontSize: 16}}
+              contentStyle={{}}
+              textColor={theme.colors.onPrimary}
+              disabled={attendanceState?.status === 0}
+              onPress={() => {
+                setVisible(true);
+              }}>
+              Punch Out
+            </Button>
+          </View>
+        </Surface>
+
+        <Surface
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            paddingVertical: 20,
+            paddingHorizontal: 30,
+            gap: 30,
+          }}>
+          {/* <Text >HOME</Text> */}
+          {/* {attendanceState?.status === 0 ? (
+            <Button
+              mode="outlined"
+              style={styles.punchInButton}
+              onPress={async () => setVisible(true)}
+              disabled={submitted}>
+              Punch In
+            </Button>
+          ) : (
+            <Button
+              mode="outlined"
+              style={styles.punchInButton}
+              disabled={attendanceState?.status === 2}
+              onPress={async () => setVisible(true)}>
+              Punch Out
+            </Button>
+          )} */}
+          {/* <LoginButton /> */}
+
+          {attendanceState?.data?.intime !== undefined && (
+            <Surface
+              // mode='primary'
+              style={{
+                width: '100%',
+                borderRadius: 10,
+                // borderWidth: 0.1,
+                // borderColor: '#ff2f00',
+                paddingHorizontal: 20,
+                paddingBottom: 10,
+                paddingTop: 15,
+                elevation: 8,
+                // backgroundColor: '#ff2f00'
+              }}>
+              <View
+                style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                <Text>TODAY</Text>
+
+                <Text>
+                  {new Date(attendanceState.data.date).toDateString()}
+                </Text>
+              </View>
+              <Divider />
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
                   width: '100%',
                   alignItems: 'center',
-                  // backgroundColor: '#ff2f00',
                 }}>
-                <Text category="s2">Punch Out:</Text>
-                <Button 
-                accessoryRight={MapIcon}
-                status='primary'
-                appearance='ghost'
-                size='small'
-                onPress={async () => {
-                  await Linking.openURL(`geo:${attendanceState.data?.outlocationlat},${attendanceState.data?.outlocationlon}`)
-                }}
-                >
-                <Text category="s1" status="primary">
-                  {tConvert(attendanceState.data.outtime)}
-                </Text>
+                <Text>Punch In:</Text>
+                <Button
+                  // accessoryRight={MapIcon}
+                  onPress={async () => {
+                    await Linking.openURL(
+                      `https://www.google.com/maps/search/?api=1&query=${attendanceState.data?.inlocationlat},${attendanceState.data?.inlocationlon}`,
+                    );
+                  }}>
+                  <Text>{timeFormat(attendanceState.data.intime)}</Text>
                 </Button>
-                
-                {/* <Icon name="map" style={{
-                  height:40}}/> */}
               </View>
-            )}
-          </Layout>
-        )}
+              <Divider />
+              {attendanceState.data.outtime !== null && (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    alignItems: 'center',
+                    // backgroundColor: '#ff2f00',
+                  }}>
+                  <Text>Punch Out:</Text>
+                  <Button
+                    // accessoryRight={MapIcon}
+                    onPress={async () => {
+                      await Linking.openURL(
+                        `https://www.google.com/maps/search/?api=1&query=${attendanceState.data?.outlocationlat},${attendanceState.data?.outlocationlon}`,
+                      );
+                    }}>
+                    <Text>{timeFormat(attendanceState.data.outtime)}</Text>
+                  </Button>
 
-        <Layout
-          // level="4"
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            width: '100%',
-          }}>
-          <Button
-            style={styles.utilButtons}
-            appearance="outline"
-            size="giant"
-            status="info"
-            onPress={() => {
-              navigation.push('EMPLOYEE_ATTENDANCE');
-            }}>
-            <Text>Attendance</Text>
-          </Button>
-          <Button
-            style={styles.utilButtons}
-            appearance="outline"
-            size="giant"
-            status="warning"
-            onPress={() => {
-              navigation.push('EMPLOYEE_PROFILE');
-            }}>
-            <Text> Profile</Text>
-          </Button>
-        </Layout>
+                  {/* <Icon name="map" style={{
+                  height:40}}/> */}
+                </View>
+              )}
+            </Surface>
+          )}
 
-        <Layout style={styles.listLayout} level="2">
-          <Text category="h5" style={styles.listTitle}>
-            Assigned Locations
-          </Text>
-          <Divider />
-          {locations === null ? (
-            <Text category="h6" style={{textAlign: 'center'}}>
+          <Surface
+            //
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              width: '100%',
+            }}>
+            <Button
+              style={styles.utilButtons}
+              mode="contained"
+              onPress={() => {
+                navigation.push('EMPLOYEE_ATTENDANCE');
+              }}>
+              <Text>Attendance</Text>
+            </Button>
+            <Button
+              style={styles.utilButtons}
+              mode="contained"
+              onPress={() => {
+                navigation.push('EMPLOYEE_PROFILE');
+              }}>
+              <Text> Profile</Text>
+            </Button>
+          </Surface>
+
+          <Surface style={styles.listSurface}>
+            <Text style={styles.listTitle}>Assigned Locations</Text>
+            <Divider />
+            {/* {locations === null ? (
+            <Text  style={{textAlign: 'center'}}>
               Error fetching locations
             </Text>
           ) : locations?.length === 0 ? (
-            <Text category="h6" style={{textAlign: 'center'}}>
+            <Text  style={{textAlign: 'center'}}>
               No locations assigned
             </Text>
           ) : (
@@ -291,9 +366,10 @@ export default function EmployeeHomeScreen({navigation}: Props) {
               ItemSeparatorComponent={Divider}
               renderItem={renderItem}
             />
-          )}
-        </Layout>
-      </Layout>
+          )} */}
+          </Surface>
+        </Surface>
+      </View>
     </>
   );
 }
@@ -303,23 +379,28 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width / 2 - 45,
     height: Dimensions.get('window').width / 2 - 60,
     borderRadius: 20,
-    borderWidth: 2,
+    // borderWidth: 2,
     // borderColor: 'cornflowerblue',
+    elevation: 30,
   },
   punchInButton: {
     width: '100%',
     height: 90,
     borderRadius: 20,
     // marginVertical: 60,
+    // elevation: 30,
+    // backgroundColor: '#ff2f00',
   },
-  listLayout: {
+  listSurface: {
     // height: 350,
+    elevation: 9,
+
     flex: 1,
     marginBottom: 30,
     width: '100%',
     borderRadius: 10,
-    borderWidth: 2,
-    // borderColor: 'cornflowerblue',
+    // borderWidth: 1,
+    // borderColor: 'grey'
   },
   listTitle: {
     textAlign: 'center',
@@ -331,7 +412,7 @@ const styles = StyleSheet.create({
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalLayout: {
+  modalSurface: {
     flexDirection: 'row',
     gap: 30,
     justifyContent: 'space-evenly',

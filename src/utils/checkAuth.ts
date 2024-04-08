@@ -1,12 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 
-/**
- * Check if the user is authenticated
- * @returns 0 if the user is not authenticated, 1 if the user is authenticated, 2 if the user is an admin
- */
+
 export default async  function checkAuth() : Promise<number> {
-  const token = await AsyncStorage.getItem('token');
+  /**
+   * Check if the user is authenticated
+   * @returns 0 if the user is not authenticated, 1 if the user is authenticated, 2 if the user is an admin
+   */
+const token = await AsyncStorage.getItem('token');
 
   if (token !== null) {
     const isAdmin = await AsyncStorage.getItem('isAdmin');

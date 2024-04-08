@@ -11,24 +11,30 @@ import {
   Text,
 } from '@ui-kitten/components';
 import { StyleSheet, Dimensions, Pressable, Alert } from 'react-native';
-import Detail from '../../components/Detail';
-import { Link, router } from 'expo-router';
+// import Detail from '../../components/Detail';
+// import { Link, router } from 'expo-router';
 import axios from 'axios';
+import Config from 'react-native-config';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AdminStackParams } from '../../../types/admin/navigation';
 
 interface IListItem {
   empid: string;
   name: string;
 }
 
-const Page = ({refreshEmployee}:{refreshEmployee: string}) => {
+type Props = NativeStackScreenProps<AdminStackParams, 'EMPLOYEE_LIST'>;
+
+const EmployeeListScreen = ({navigation}:Props) => {
   const [empid, setEmpid] = React.useState('')
   const [employees, setEmployees] = React.useState<Array<IListItem>>([]);
   const [visible, setVisible] = React.useState(false);
 
   React.useEffect(() => {
+
     (async () => {
       await axios
-        .get(Config.BASE_URL + 'employee/all.php')
+        .get(Config.BASE_URL + 'admin/employee/all.php')
         .then((res) => {
           console.log('res', res.data);
           setEmployees(res.data);
@@ -37,7 +43,7 @@ const Page = ({refreshEmployee}:{refreshEmployee: string}) => {
           console.log('err', err);
         });
     })();
-  }, [refreshEmployee]);
+  }, []);
 
   const createEmployee = async () => {
     await axios
@@ -72,15 +78,17 @@ const Page = ({refreshEmployee}:{refreshEmployee: string}) => {
   }): React.ReactElement => (
     // <Link href={'/(employee)/' + item.empid}>
     <ListItem
-      title={`${item.name}`}
-      description={`Employee Id: ${item.empid} `}
+      title={`${item.name} [${item.empid}]`}
+      description={`${item.email} `}
       accessoryLeft={renderItemIcon}
       style={{ borderRadius: 10, marginBottom: 10 }}
       onPress={() => {
-        router.push(`/(employee)/${item.empid}`,);
+        navigation.navigate('EMPLOYEE_DETAIL', {id: item.empid})
+        // router.push(`/(employee)/${item.empid}`,);
       }}
     />
     // </Link>
+    
   );
 
   return (
@@ -102,10 +110,6 @@ const Page = ({refreshEmployee}:{refreshEmployee: string}) => {
         style={{ backgroundColor: 'rgba(0, 0, 0, 0)', borderWidth: 0 }}
       >
         <Layout style={styles.addLocationContainer}>
-          {/* <Text category='h5' 
-         >
-            Enter Coordinates
-          </Text> */}
           <Input
             placeholder="employee id"
              value={empid} onChangeText={setEmpid}
@@ -193,4 +197,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Page;
+
+export default EmployeeListScreen;

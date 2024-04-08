@@ -8,11 +8,14 @@ import {
   SelectItem,
   IndexPath,
   Divider,
+  List,
+  ListItem,
 } from '@ui-kitten/components';
 import axios from 'axios';
 import Config from 'react-native-config';
 import { Record } from '../../../types/employee/attendance';
-import { Alert } from 'react-native';
+import { Alert, ScrollView } from 'react-native';
+import { timeFormat } from '../../utils/timeFormat';
 
 const years = [
   '2024',
@@ -62,6 +65,13 @@ const monthNo = {
   December: 12,
 };
 
+const RecordItem = ({item, index}: {item: Record; index: number}) => (
+  <ListItem
+    title={new Date(item.date).toDateString()}
+    description={`${timeFormat(item.intime)} - ${timeFormat(item.outtime)}`}
+  />
+);
+
 const AttendanceScreen = () => {
   const [selectedYearIndex, setSelectedYearIndex] = React.useState<IndexPath>(
     new IndexPath(0),
@@ -85,12 +95,21 @@ const AttendanceScreen = () => {
       await axios.get(`${Config.BASE_URL}employee/attendance/get.php?year=${year}&month=${month}`).
       then(res => res.data).
       then(res => {
-        console.log(res);
+        // console.log(res);
         if (res.status === 0) {
           Alert.alert('Error', res.message ?? 'Something went wrong');
           return;
         } else if (res.status === 1) {
         setRecords(res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // records.push(...res.records)
+        // console.log(records.length);
+        // setRecords(records)
         }
       })
     };
@@ -111,10 +130,13 @@ const AttendanceScreen = () => {
     <Layout
       style={{
         padding: 20,
-        gap: 15,
+        // gap: 15,
         flex: 1,
       }}>
-      <Text>Select Year</Text>
+      <Text status='primary' category='label' style={{
+        marginBottom: 10,
+        marginLeft: 5
+      }}>Select Year</Text>
       <Select
         selectedIndex={selectedYearIndex}
         onSelect={index => setSelectedYearIndex(new IndexPath(Number(index)-1))}
@@ -123,7 +145,11 @@ const AttendanceScreen = () => {
           <SelectItem key={index} title={item} />
         ))}
       </Select>
-      <Text>Select Month</Text>
+      <Text status='primary' category='label' style={{
+        marginBottom: 10,
+        marginTop: 20,
+        marginLeft: 5
+      }}>Select Month</Text>
       <Select
         selectedIndex={selectedMonthIndex}
         onSelect={index => setSelectedMonthIndex(new IndexPath(Number(index)-1))}
@@ -132,22 +158,14 @@ const AttendanceScreen = () => {
           <SelectItem key={index} title={item} />
         ))}
       </Select>
-      {/* <Button> 
-        <Text>
-          Get Attendance
-        </Text>
-      </Button> */}
       <Divider />
-      <Layout>
-        {records.map((item, index) => (
-          <Layout key={index} style={{paddingVertical: 10}}>
-            <Text category="h6">{item.date}</Text>
-            <Text category="p1">Punch In: {item.intime}</Text>
-            <Text category="p1">Punch Out: {item.outtime}</Text>
-          </Layout>
-    
-        ))}
-      </Layout>
+      {/* <ScrollView> */}
+      
+        <List data={records} renderItem={RecordItem} style={{
+          marginTop: 20,
+          // marginBottom: 20
+        }}/>
+      {/* </ScrollView> */}
     </Layout>
   );
 };

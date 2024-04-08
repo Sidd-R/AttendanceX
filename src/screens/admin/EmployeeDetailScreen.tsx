@@ -9,14 +9,20 @@ import {
   Layout,
   ListItem,
   Text,
+  // DatepickerElement
 } from '@ui-kitten/components';
 import { StyleSheet, Dimensions, ScrollView, Alert, View } from 'react-native';
-import Detail from '../../components/Detail';
-import { router, useLocalSearchParams } from 'expo-router';
+// import Detail from '../../components/Detail';
+// import { router, useLocalSearchParams } from 'expo-router';
 import { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import axios from 'axios';
-import { Employee, Location } from '../../types';
-import AEmployee from '../../components/AEmployee';
+import Config from 'react-native-config';
+import Detail from '../../components/admin/Detail';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { AdminStackParams } from '../../../types/admin/navigation';
+import AEmployee from '../../components/admin/AEmployee';
+// import { Employee, Location } from '../../types';
+// import AEmployee from '../../components/AEmployee';
 
 const CalendarIcon = (props: any): IconElement => (
   <Icon {...props} name="calendar" />
@@ -75,10 +81,10 @@ const employeeListItem = (item: Employee): React.ReactElement => {
   );
 };
 
-const Page = () => {
-  // console.log(props,"ff");
+type Props = NativeStackScreenProps<AdminStackParams, 'EMPLOYEE_DETAIL'>;
 
-  const { id } = useLocalSearchParams();
+const EmployeeDetailScreen = ({route}:Props): React.JSX.Element => {
+  
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [empid, setEmpid] = useState('');
@@ -158,13 +164,14 @@ const Page = () => {
 
   useEffect(() => {
     //get employee data from id
-    console.log(id);
+    // console.log(id);
 
     (async () => {
       await axios
-        .post(Config.BASE_URL + 'employee/profile.php', {
-          empid: id,
+        .post(Config.BASE_URL + 'admin/employee/profile.php', {
+          empid: route.params.id,
         })
+        // .then()
         .then((res) => {
           console.log('profile', res.data);
           // setEmployees(res.data);
@@ -197,21 +204,21 @@ const Page = () => {
   };
 
   const showModeIn = (currentMode: any) => {
-    DateTimePickerAndroid.open({
-      value: inTime,
-      onChange: onChangeIn,
-      mode: currentMode,
-      is24Hour: false,
-    });
+  //   DateTimePickerAndroid.open({
+  //     value: inTime,
+  //     onChange: onChangeIn,
+  //     mode: currentMode,
+  //     is24Hour: false,
+  //   });
   };
 
   const showModeOut = (currentMode: any) => {
-    DateTimePickerAndroid.open({
-      value: outTime,
-      onChange: onChangeOut,
-      mode: currentMode,
-      is24Hour: false,
-    });
+    // DateTimePickerAndroid.open({
+    //   value: outTime,
+    //   onChange: onChangeOut,
+    //   mode: currentMode,
+    //   is24Hour: false,
+    // });
   };
 
   const showTimepickerIn = () => {
@@ -280,19 +287,21 @@ const Page = () => {
             <Detail attribute="Last Updated" value={lastUpdated} />
           </Layout>
 
-          <Button
+          {/* <Button
             status="info"
             appearance="outline"
             size="giant"
-            onPress={() =>
-              router.push(
-                `/(employee)/employeeLocation?latitude=${latitude}&longitude=${999}`
-              )
-            }
+            // onPress={() =>
+              // router.push(
+              //   `/(employee)/employeeLocation?latitude=${latitude}&longitude=${999}`
+              // )
+            // }
           >
             Last Updated Location
-          </Button>
-
+          </Button> */}
+          <Datepicker
+          
+          />
           <Layout level="2" style={styles.attendanceContainer}>
             <Layout style={styles.attendance} level="2">
               <Layout
@@ -338,7 +347,7 @@ const Page = () => {
             </Layout>
           </Layout>
 
-          <Layout
+          {/* <Layout
             level="2"
             style={styles.assignedLocation}
             pointerEvents={deleteLocation ? 'none' : 'auto'}
@@ -360,9 +369,9 @@ const Page = () => {
                 </Text>
               )}
             </Layout>
-          </Layout>
+          </Layout> */}
 
-          <Layout
+          {/* <Layout
             level="2"
             style={styles.assignedLocation}
             pointerEvents={deleteAssignedEmp ? 'none' : 'auto'}
@@ -384,7 +393,7 @@ const Page = () => {
                 </Text>
               )}
             </Layout>
-          </Layout>
+          </Layout> */}
 
           <Button
             status="warning"
@@ -484,4 +493,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Page;
+export default EmployeeDetailScreen;
